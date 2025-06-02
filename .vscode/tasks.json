@@ -1,0 +1,31 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build Segment",
+            "type": "shell",
+            "command": "nvcc",
+            "args": [
+                "-std=c++11",
+                "-Xcompiler", "/EHsc",
+                // Lista aquí tus .cu y .cpp
+                "segment.cu",
+                "misc.cpp",
+                "pnmfile.cpp",
+                "image.cpp",
+                "-o", "segment.exe"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always"
+            },
+            "problemMatcher": [
+                "$msCompile"
+            ]
+        }
+    ]
+}
