@@ -6,6 +6,7 @@
 #include "pnmfile.h"
 #include "segment-image.cuh"
 #include <cuda_runtime.h>
+#include <opencv2/opencv.hpp> // Incluye OpenCV para visualización
 
 // Programa principal que realiza la segmentación de una imagen utilizando CUDA.
 int main(int argc, char **argv) {
@@ -24,6 +25,13 @@ int main(int argc, char **argv) {
     printf("loading input image.\n");
     image<rgb> *input = loadPPM(argv[4]);
 
+    // Convierte la imagen de entrada a formato OpenCV para visualización.
+    cv::Mat input_mat(input->height(), input->width(), CV_8UC3, input->data);
+    cv::cvtColor(input_mat, input_mat, cv::COLOR_RGB2BGR); // Convierte de RGB a BGR para OpenCV.
+
+    // Muestra la imagen original.
+    cv::imshow("Original Image", input_mat);
+
     // Inicia el proceso de segmentación de la imagen.
     printf("processing\n");
     auto start = std::chrono::high_resolution_clock::now(); // Marca el inicio del tiempo de ejecución.
@@ -37,12 +45,28 @@ int main(int argc, char **argv) {
     // Imprime el tiempo de ejecución del algoritmo CUDA.
     printf("Tiempo de ejecución CUDA: %.6f segundos\n", elapsed.count());
 
+    // Calcula la memoria utilizada por las imágenes.
+    size_t input_memory = input->width() * input->height() * sizeof(rgb);
+    size_t seg_memory = seg->width() * seg->height() * sizeof(rgb);
+    printf("Memoria utilizada por la imagen de entrada: %zu bytes\n", input_memory);
+    printf("Memoria utilizada por la imagen segmentada: %zu bytes\n", seg_memory);
+
+    // Convierte la imagen segmentada a formato OpenCV para visualización.
+    cv::Mat seg_mat(seg->height(), seg->width(), CV_8UC3, seg->data);
+    cv::cvtColor(seg_mat, seg_mat, cv::COLOR_RGB2BGR); // Convierte de RGB a BGR para OpenCV.
+
+    // Muestra la imagen segmentada.
+    cv::imshow("Segmented Image", seg_mat);
+
     // Guarda la imagen segmentada en un archivo PPM.
     savePPM(seg, argv[5]);
 
     // Imprime el número de componentes conectados encontrados.
     printf("Los %d componentes\n", num_ccs);
     printf("HECHO!.\n");
+
+    // Espera a que el usuario cierre las ventanas de visualización.
+    cv::waitKey(0);
 
     // Libera la memoria utilizada por las imágenes.
     delete input;
