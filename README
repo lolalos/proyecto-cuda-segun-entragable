@@ -1,25 +1,86 @@
+<!-- 
+Este README describe la implementación de un algoritmo de segmentación basado en el artículo 
+"Efficient Graph-Based Image Segmentation" de Pedro F. Felzenszwalb y Daniel P. Huttenlocher, 
+publicado en el International Journal of Computer Vision, 59(2), septiembre de 2004.
 
-Implementation of the segmentation algorithm described in:
+El programa utiliza CUDA para un procesamiento paralelo eficiente, lo que permite una 
+computación más rápida del algoritmo de segmentación en GPUs compatibles. CUDA se emplea 
+para realizar operaciones como suavizado de imágenes, construcción de grafos y segmentación 
+en paralelo, reduciendo significativamente el tiempo de procesamiento para imágenes grandes.
 
-Efficient Graph-Based Image Segmentation
-Pedro F. Felzenszwalb and Daniel P. Huttenlocher
-International Journal of Computer Vision, 59(2) September 2004.
+### Instrucciones de Uso:
 
-The program takes a color image (PPM format) and produces a segmentation
-with a random color assigned to each region.
+1. **Compilación**:
+    - Escriba `make` para compilar el programa. Asegúrese de que el toolkit de CUDA esté instalado y configurado correctamente en su sistema.
 
-1) Type "make" to compile "segment".
+2. **Ejecución**:
+    - Ejecute el programa utilizando el siguiente comando:
+      ```
+      ./segment sigma k min input output
+      ```
+      - `sigma`: Se utiliza para suavizar la imagen de entrada antes de segmentarla. Este parámetro controla el desenfoque gaussiano aplicado a la imagen.
+      - `k`: Valor para la función de umbral. Valores más grandes generan componentes más grandes en el resultado de la segmentación.
+      - `min`: Tamaño mínimo de componente aplicado en el post-procesamiento. Los componentes más pequeños se fusionan para cumplir con este requisito de tamaño.
+      - `input`: Ruta al archivo de imagen de entrada (formato PPM).
+      - `output`: Ruta al archivo de imagen de salida (formato PPM).
 
-2) Run "segment sigma k min input output".
+3. **Conversión de Imágenes**:
+    - Si la imagen de entrada no está en formato PPM, conviértala utilizando el comando `convert`:
+      ```
+      convert input.png output.ppm
+      ```
+    - De manera similar, después de la segmentación, puede convertir la imagen de salida nuevamente al formato PNG si es necesario.
 
-The parameters are: (see the paper for details)
+4. **Ejemplo de Ejecución**:
+    - Los parámetros típicos para el algoritmo de segmentación son:
+      ```
+      ./segment 0.5 500 20 image_data/input.ppm image_data/output.ppm
+      ```
+    - Este ejemplo utiliza `sigma = 0.5`, `k = 500` y `min = 20`.
 
-sigma: Used to smooth the input image before segmenting it.
-k: Value for the threshold function.
-min: Minimum component size enforced by post-processing.
-input: Input image.
-output: Output image.
+### Notas:
+- La aceleración con CUDA asegura que el algoritmo de segmentación se ejecute eficientemente en conjuntos de datos grandes.
+- Asegúrese de que su sistema tenga una GPU NVIDIA compatible y los controladores CUDA necesarios instalados.
+- Consulte el artículo para explicaciones detalladas sobre el algoritmo y la configuración de parámetros.
+-->
 
-Typical parameters are sigma = 0.5, k = 500, min = 20.
-Larger values for k result in larger components in the result.
+Implementación del algoritmo de segmentación descrito en:
 
+Efficient Graph-Based Image Segmentation  
+Pedro F. Felzenszwalb y Daniel P. Huttenlocher  
+International Journal of Computer Vision, 59(2), septiembre de 2004.
+
+El programa toma una imagen en color (formato PPM) y produce una segmentación con un color aleatorio asignado a cada región.
+
+1) Escriba "make" para compilar "segment".
+
+2) Ejecute "segment sigma k min input output".
+
+Los parámetros son: (consulte el artículo para más detalles)
+
+- `sigma`: Se utiliza para suavizar la imagen de entrada antes de segmentarla.  
+- `k`: Valor para la función de umbral.  
+- `min`: Tamaño mínimo de componente aplicado en el post-procesamiento.  
+- `input`: Imagen de entrada.  
+- `output`: Imagen de salida.
+
+Parámetros típicos: `sigma = 0.5`, `k = 500`, `min = 20`.  
+Valores más grandes para `k` generan componentes más grandes en el resultado.
+
+### Ejecución:
+```
+./segment 0.5 500 20 image_data/input.ppm image_data/output.ppm
+```
+
+### Conversión:
+```
+convert input.png output.ppm
+convert image_data/input.png image_data/input.ppm
+```
+
+### Ejemplo completo:
+```
+convert image_data/input.png image_data/input.ppm
+./segment 0.5 500 20 image_data/input.ppm image_data/output.ppm
+convert image_data/output.ppm image_data/output.png
+```
